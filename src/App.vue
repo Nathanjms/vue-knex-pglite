@@ -12,7 +12,7 @@ const totalRows = ref(0);
 async function insertRows() {
   // Insert 5000 rows:
   try {
-    await db("users").insert(Array.from({ length: 5000 }, (_, i) => ({ user_name: `User ${i}` })));
+    await db("users").insert(Array.from({ length: 5_000 }, (_, i) => ({ user_name: `User ${i}` })));
     await search();
   } catch (error) {
     alert(error);
@@ -58,7 +58,7 @@ async function search() {
   <h2>{{ totalRows }} total rows</h2>
   <button @click="insertRows">Insert 5,000 rows</button>
   <button @click="truncateTable">Truncate table</button>
-  <input type="text" v-model="searchQuery" />
+  <input @keyup.enter="search" type="text" v-model="searchQuery" />
   <button @click="() => search()">Search</button>
   <table>
     <tbody>

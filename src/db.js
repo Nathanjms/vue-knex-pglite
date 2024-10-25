@@ -7,11 +7,15 @@ export const db = knex({
   connection: { connectionString: "idb://my-database" },
 });
 
-// If this is the first time the DB is created, then we need to create the tables:
-if (!(await db.schema.hasTable("users"))) {
-  // Create a table
-  await db.schema.createTable("users", (table) => {
-    table.increments("id");
-    table.string("user_name");
-  });
+initDb();
+
+async function initDb() {
+  // If this is the first time the DB is created, then we need to create the tables:
+  if (!(await db.schema.hasTable("users"))) {
+    // Create a table
+    await db.schema.createTable("users", (table) => {
+      table.increments("id");
+      table.string("user_name");
+    });
+  }
 }
