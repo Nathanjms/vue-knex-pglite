@@ -6,10 +6,13 @@ const dbTableData = ref([]);
 
 onMounted(search);
 
+const searchQuery = ref("");
+const totalRows = ref(0);
+
 async function insertRows() {
-  // Insert 50 rows:
+  // Insert 5000 rows:
   try {
-    await db("users").insert(Array.from({ length: 50 }, (_, i) => ({ user_name: `User ${i}` })));
+    await db("users").insert(Array.from({ length: 5000 }, (_, i) => ({ user_name: `User ${i}` })));
     await search();
   } catch (error) {
     alert(error);
@@ -25,7 +28,6 @@ async function truncateTable() {
   }
 }
 
-const searchQuery = ref("");
 async function search() {
   try {
     const query = db("users");
@@ -34,6 +36,8 @@ async function search() {
     }
     const rows = await query.select("id", "user_name");
 
+    const totalRowQuery = await db("users").count();
+    totalRows.value = totalRowQuery[0].count.toLocaleString();
     dbTableData.value = rows;
   } catch (error) {
     alert(error);
@@ -51,7 +55,8 @@ async function search() {
     </a>
   </div>
   <h1>Table</h1>
-  <button @click="insertRows">Insert 50 rows</button>
+  <h2>{{ totalRows }} total rows</h2>
+  <button @click="insertRows">Insert 5,000 rows</button>
   <button @click="truncateTable">Truncate table</button>
   <input type="text" v-model="searchQuery" />
   <button @click="() => search()">Search</button>
@@ -60,9 +65,17 @@ async function search() {
       <tr>
         <th>User</th>
       </tr>
-      <tr v-for="row in dbTableData" :key="row.user">
-        <td>{{ row.user_name }}</td>
+      <tr v-if="dbTableData.length === 0">
+        <td>No data</td>
       </tr>
+      <tr v-else-if="dbTableData.length > 5000">
+        <td>Too many rows to display and I haven't bothered with pagination - maybe try searching?</td>
+      </tr>
+      <template v-else>
+        <tr v-for="row in dbTableData" :key="row.user">
+          <td>{{ row.user_name }}</td>
+        </tr>
+      </template>
     </tbody>
   </table>
 </template>
