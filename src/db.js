@@ -8,7 +8,10 @@ export const db = knex({
 });
 
 // If this is the first time the DB is created, then we need to create the tables:
-await db.schema.createTableIfNotExists("users", (table) => {
-  table.increments("id");
-  table.string("user_name");
-});
+if (!(await db.schema.hasTable("users"))) {
+  // Create a table
+  await db.schema.createTable("users", (table) => {
+    table.increments("id");
+    table.string("user_name");
+  });
+}
